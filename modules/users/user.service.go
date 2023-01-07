@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"math"
 
 	"gorm.io/gorm"
 
@@ -20,9 +19,9 @@ func NewUserService() UserService {
 
 var UserOmit = []string{"password"}
 
-func (service *UserService) CreateUser(body CreateUserBody) (*model.User, error) {
+func (this *UserService) CreateUser(body CreateUserBody) (*model.User, error) {
 	db := database.DB
-	existedUser, err := service.GetUserByUsername(body.Username)
+	existedUser, err := this.GetUserByUsername(body.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +54,10 @@ func (*UserService) GetUserList(query GetUserListQuery) (common.GetListResponse,
 	db := database.DB
 	var items []model.User
 	var totalItems int64
-	page := int(math.Max(common.DEFAULT_PAGE_VALUE, float64(query.Page)))
-	limit := query.Limit
+
+	parsedQuery := ParseGetUserListQuery(query)
+	page := parsedQuery.Page
+	limit := parsedQuery.Limit
 	offset := (page - 1) * limit
 	err := db.Model(&model.User{}).Limit(limit).Offset(offset).Omit(UserOmit...).Find(&items).Count(&totalItems).Error
 	return common.NewGetListResponse(items, totalItems), err
@@ -79,9 +80,9 @@ func (*UserService) GetUserByUsername(username string) (*model.User, error) {
 	return &user, err
 }
 
-func (service *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBody) (*model.User, error) {
+func (this *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBody) (*model.User, error) {
 	db := database.DB
-	user, err := service.GetUserById(id)
+	user, err := this.GetUserById(id)
 	if err != nil {
 		return user, err
 	}
@@ -90,19 +91,19 @@ func (service *UserService) UpdateUserProfileById(id int, body UpdateUserProfile
 		user.Email = body.Email
 	}
 
-	db.Save(&user)
+	err = db.Save(&user).Error
 
-	return user, nil
+	return user, err
 }
 
-func (service *UserService) DeleteUserById(id int) error {
+func (this *UserService) DeleteUserById(id int) error {
 	db := database.DB
-	user, err := service.GetUserById(id)
+	user, err := this.GetUserById(id)
 
 	if err != nil {
 		return err
 	}
 
-	db.Delete(&user)
-	return nil
+	err = db.Delete(&user).Error
+	return err
 }

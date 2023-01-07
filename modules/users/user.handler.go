@@ -18,14 +18,14 @@ func NewUserHandler(userService UserService) UserHandler {
 	}
 }
 
-func (handler *UserHandler) GetUserList(c *fiber.Ctx) error {
+func (this *UserHandler) GetUserList(c *fiber.Ctx) error {
 	var query GetUserListQuery
 
 	if err := c.QueryParser(&query); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid query arguments!"))
 	}
 
-	users, err := handler.userService.GetUserList(ParseGetUserListQuery(query))
+	users, err := this.userService.GetUserList(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -34,13 +34,13 @@ func (handler *UserHandler) GetUserList(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(users))
 }
 
-func (handler *UserHandler) GetUserById(c *fiber.Ctx) error {
+func (this *UserHandler) GetUserById(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "User id must be number!"))
 	}
-	user, err := handler.userService.GetUserById(id)
+	user, err := this.userService.GetUserById(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -49,7 +49,7 @@ func (handler *UserHandler) GetUserById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(user))
 }
 
-func (handler *UserHandler) UpdateUserProfile(c *fiber.Ctx) error {
+func (this *UserHandler) UpdateUserProfile(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
@@ -61,7 +61,7 @@ func (handler *UserHandler) UpdateUserProfile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid update body!"))
 	}
 
-	updatedUser, err := handler.userService.UpdateUserProfileById(id, body)
+	updatedUser, err := this.userService.UpdateUserProfileById(id, body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -70,14 +70,14 @@ func (handler *UserHandler) UpdateUserProfile(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(updatedUser))
 }
 
-func (handler *UserHandler) DeleteUser(c *fiber.Ctx) error {
+func (this *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "User id must be number!"))
 	}
 
-	err = handler.userService.DeleteUserById(id)
+	err = this.userService.DeleteUserById(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))

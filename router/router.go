@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 
 	"hanhngo.me/m/modules/auth"
+	"hanhngo.me/m/modules/roles"
 	"hanhngo.me/m/modules/users"
 	"hanhngo.me/m/plugins/jwt"
 )
@@ -15,6 +16,8 @@ var (
 	jwtService  = jwt.NewJwtService()
 	authService = auth.NewAuthService(userService, jwtService)
 	authHandler = auth.NewAuthHandler(authService, userService)
+	roleService = roles.NewRoleService()
+	roleHandler = roles.NewRoleHandler(roleService)
 )
 
 func SetupRouters(app *fiber.App) {
@@ -33,4 +36,11 @@ func SetupRouters(app *fiber.App) {
 	userRoutes.Get("/:id", userHandler.GetUserById)
 	userRoutes.Patch("/:id", userHandler.UpdateUserProfile)
 	userRoutes.Delete("/:id", userHandler.DeleteUser)
+
+	roleRoutes := api.Group("/roles", logger.New())
+	roleRoutes.Post("/", roleHandler.CreateRole)
+	roleRoutes.Get("/", roleHandler.GetRoleList)
+	roleRoutes.Get("/:id", roleHandler.GetRoleById)
+	roleRoutes.Patch("/:id", roleHandler.UpdateRole)
+	roleRoutes.Delete("/:id", roleHandler.DeleteRole)
 }

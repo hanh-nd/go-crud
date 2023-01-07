@@ -20,14 +20,14 @@ func NewAuthService(userService users.UserService, jwtService jwt.JwtService) Au
 	}
 }
 
-func (service *AuthService) Register(body users.CreateUserBody) (string, error) {
-	user, err := service.userService.CreateUser(body)
+func (this *AuthService) Register(body users.CreateUserBody) (string, error) {
+	user, err := this.userService.CreateUser(body)
 
 	if err != nil {
 		return "", err
 	}
 
-	accessToken, err := service.jwtService.Sign(user.ID, user.Username)
+	accessToken, err := this.jwtService.Sign(user.ID, user.Username)
 
 	if err != nil {
 		return "", err
@@ -36,9 +36,9 @@ func (service *AuthService) Register(body users.CreateUserBody) (string, error) 
 	return accessToken, nil
 }
 
-func (service *AuthService) Login(body LoginBody) (string, error) {
+func (this *AuthService) Login(body LoginBody) (string, error) {
 	username := body.Username
-	user, err := service.userService.GetUserByUsername(username)
+	user, err := this.userService.GetUserByUsername(username)
 
 	if err != nil {
 		return "", err
@@ -52,7 +52,7 @@ func (service *AuthService) Login(body LoginBody) (string, error) {
 		return "", errors.New("Invalid username or password")
 	}
 
-	accessToken, err := service.jwtService.Sign(user.ID, user.Username)
+	accessToken, err := this.jwtService.Sign(user.ID, user.Username)
 
 	if err != nil {
 		return "", err
