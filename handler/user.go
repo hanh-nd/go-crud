@@ -7,6 +7,16 @@ import (
 	"hanhngo.me/m/model"
 )
 
+func GetUserList(c *fiber.Ctx) error {
+	db := database.DB
+	var userList []model.User
+	db.Find(&userList)
+	return c.Status(200).JSON(fiber.Map{
+		"code": 200,
+		"data": userList,
+	})
+}
+
 func GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB

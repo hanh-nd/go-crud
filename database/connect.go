@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"hanhngo.me/m/config"
+	"hanhngo.me/m/model"
 )
 
 var DB *gorm.DB
@@ -29,7 +30,7 @@ func Connect() {
 
 	DB = db
 	fmt.Println("Connected to the database")
-	db.AutoMigrate()
+	db.AutoMigrate(&model.User{}, &model.Product{})
 }
 
 func Migrate(tables ...interface{}) error {

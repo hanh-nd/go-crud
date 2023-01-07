@@ -15,6 +15,7 @@ func SetupRouters(app *fiber.App) {
 	api := app.Group("/api", logger.New())
 
 	user := api.Group("/users", logger.New())
+	user.Get("/", handler.GetUserList)
 	user.Get("/:id", handler.GetUser)
 	user.Post("/", handler.CreateUser)
 	user.Patch("/:id", handler.UpdateUser)
