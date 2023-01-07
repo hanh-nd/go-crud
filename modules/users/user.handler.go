@@ -28,7 +28,7 @@ func (handler *UserHandler) GetUserList(c *fiber.Ctx) error {
 	users, err := handler.userService.GetUserList(ParseGetUserListQuery(query))
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(common.NewErrorResponse(fiber.StatusInternalServerError))
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(users))
@@ -43,7 +43,7 @@ func (handler *UserHandler) GetUserById(c *fiber.Ctx) error {
 	user, err := handler.userService.GetUserById(id)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(common.NewErrorResponse(fiber.StatusInternalServerError))
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(user))
@@ -64,7 +64,7 @@ func (handler *UserHandler) UpdateUserProfile(c *fiber.Ctx) error {
 	updatedUser, err := handler.userService.UpdateUserProfileById(id, body)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(common.NewErrorResponse(fiber.StatusInternalServerError))
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(updatedUser))
@@ -80,7 +80,7 @@ func (handler *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	err = handler.userService.DeleteUserById(id)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(common.NewErrorResponse(fiber.StatusInternalServerError))
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Deleted!"))

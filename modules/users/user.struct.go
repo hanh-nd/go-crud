@@ -37,6 +37,12 @@ func ParseGetUserListQuery(query GetUserListQuery) GetUserListQuery {
 	}
 }
 
+type CreateUserBody struct {
+	Username string
+	Email    string
+	Password string
+}
+
 type UpdateUserProfileBody struct {
 	Email string
 }

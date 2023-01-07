@@ -6,13 +6,15 @@ import (
 
 	"hanhngo.me/m/modules/auth"
 	"hanhngo.me/m/modules/users"
+	"hanhngo.me/m/plugins/jwt"
 )
 
 var (
-	authService auth.AuthService  = auth.AuthService{}
-	authHandler auth.AuthHandler  = auth.NewAuthHandler(authService, userService)
-	userService users.UserService = users.UserService{}
-	userHandler users.UserHandler = users.NewUserHandler(userService)
+	userService = users.NewUserService()
+	userHandler = users.NewUserHandler(userService)
+	jwtService  = jwt.NewJwtService()
+	authService = auth.NewAuthService(userService, jwtService)
+	authHandler = auth.NewAuthHandler(authService, userService)
 )
 
 func SetupRouters(app *fiber.App) {
@@ -23,8 +25,8 @@ func SetupRouters(app *fiber.App) {
 	api := app.Group("/api", logger.New())
 
 	authRoutes := app.Group("/", logger.New())
-	authRoutes.Post("/register")
-	authRoutes.Post("/login")
+	authRoutes.Post("/register", authHandler.Register)
+	authRoutes.Post("/login", authHandler.Login)
 
 	userRoutes := api.Group("/users", logger.New())
 	userRoutes.Get("/", userHandler.GetUserList)
