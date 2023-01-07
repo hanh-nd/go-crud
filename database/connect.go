@@ -30,7 +30,16 @@ func Connect() {
 
 	DB = db
 	fmt.Println("Connected to the database")
-	db.AutoMigrate(&model.User{}, &model.Product{})
+	db.AutoMigrate(&model.Permission{}, &model.Role{}, &model.RoleGroup{}, &model.User{}, &model.UserGroup{})
+	setupRelationships(db)
+}
+
+func setupRelationships(db *gorm.DB) {
+	db.SetupJoinTable(&model.Role{}, "Permissions", &model.RolePermission{})
+	db.SetupJoinTable(&model.RoleGroup{}, "Roles", &model.RoleGroupRole{})
+	db.SetupJoinTable(&model.User{}, "Roles", &model.UserRole{})
+	db.SetupJoinTable(&model.User{}, "RoleGroups", &model.UserRoleGroup{})
+	db.SetupJoinTable(&model.User{}, "UserGroups", &model.UserGroupUser{})
 }
 
 func Migrate(tables ...interface{}) error {
