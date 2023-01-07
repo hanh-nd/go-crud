@@ -8,9 +8,11 @@ import (
 	"hanhngo.me/m/model"
 )
 
+type UserService struct{}
+
 var UserOmit = []string{"password"}
 
-func GetUserListService(query GetUserListQuery) (common.GetListResponse, error) {
+func (*UserService) GetUserList(query GetUserListQuery) (common.GetListResponse, error) {
 	db := database.DB
 	var items []model.User
 	var totalItems int64
@@ -21,16 +23,16 @@ func GetUserListService(query GetUserListQuery) (common.GetListResponse, error) 
 	return common.NewGetListResponse(items, totalItems), err
 }
 
-func GetUserByIdService(id int) (model.User, error) {
+func (*UserService) GetUserById(id int) (model.User, error) {
 	db := database.DB
 	var user model.User
 	err := db.Model(&model.User{}).Omit(UserOmit...).First(&user, id).Error
 	return user, err
 }
 
-func UpdateUserProfileByIdService(id int, body UpdateUserProfileBody) (model.User, error) {
+func (service *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBody) (model.User, error) {
 	db := database.DB
-	user, err := GetUserByIdService(id)
+	user, err := service.GetUserById(id)
 	if err != nil {
 		return user, err
 	}
@@ -44,9 +46,9 @@ func UpdateUserProfileByIdService(id int, body UpdateUserProfileBody) (model.Use
 	return user, nil
 }
 
-func DeleteUserByIdService(id int) error {
+func (service *UserService) DeleteUserById(id int) error {
 	db := database.DB
-	user, err := GetUserByIdService(id)
+	user, err := service.GetUserById(id)
 
 	if err != nil {
 		return err
