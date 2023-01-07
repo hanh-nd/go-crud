@@ -7,7 +7,7 @@ import (
 )
 
 type UserGroupUser struct {
-	ID          uint           `gorm:"primaryKey" json:"id"`
+	ID          uint           `gorm:"primaryKey; autoIncrement" json:"id"`
 	UserGroupID uint           `gorm:"primaryKey" json:"userGroupId"`
 	UserID      uint           `gorm:"primaryKey" json:"userId"`
 	CreatedAt   time.Time      `json:"createdAt"`

@@ -7,7 +7,7 @@ import (
 )
 
 type RolePermission struct {
-	ID           uint           `gorm:"primaryKey" json:"id"`
+	ID           uint           `gorm:"primaryKey; autoIncrement" json:"id"`
 	RoleID       uint           `gorm:"primaryKey" json:"roleId"`
 	PermissionID uint           `gorm:"primaryKey" json:"permissionId"`
 	CreatedAt    time.Time      `json:"createdAt"`
