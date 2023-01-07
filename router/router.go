@@ -8,6 +8,7 @@ import (
 	"hanhngo.me/m/modules/permissions"
 	roleGroups "hanhngo.me/m/modules/role-groups"
 	"hanhngo.me/m/modules/roles"
+	userGroups "hanhngo.me/m/modules/user-groups"
 	"hanhngo.me/m/modules/users"
 	"hanhngo.me/m/plugins/jwt"
 )
@@ -24,6 +25,8 @@ var (
 	permissionHandler = permissions.NewPermissionHandler(permissionService)
 	roleGroupService  = roleGroups.NewRoleGroupService()
 	roleGroupHandler  = roleGroups.NewRoleGroupHandler(roleGroupService)
+	userGroupService  = userGroups.NewUserGroupService()
+	userGroupHandler  = userGroups.NewUserGroupHandler(userGroupService)
 )
 
 func SetupRouters(app *fiber.App) {
@@ -63,4 +66,11 @@ func SetupRouters(app *fiber.App) {
 	roleGroupRoutes.Get("/:id", roleGroupHandler.GetRoleGroupById)
 	roleGroupRoutes.Patch("/:id", roleGroupHandler.UpdateRoleGroup)
 	roleGroupRoutes.Delete("/:id", roleGroupHandler.DeleteRoleGroup)
+
+	userGroupRoutes := api.Group("/user-groups", logger.New())
+	userGroupRoutes.Post("/", userGroupHandler.CreateUserGroup)
+	userGroupRoutes.Get("/", userGroupHandler.GetUserGroupList)
+	userGroupRoutes.Get("/:id", userGroupHandler.GetUserGroupById)
+	userGroupRoutes.Patch("/:id", userGroupHandler.UpdateUserGroup)
+	userGroupRoutes.Delete("/:id", userGroupHandler.DeleteUserGroup)
 }
