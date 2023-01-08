@@ -7,10 +7,10 @@ import (
 )
 
 type GetPermissionListQuery struct {
-	Page           int
-	Limit          int
-	OrderBy        string
-	OrderDirection string
+	Page           int    `json:"page"`
+	Limit          int    `json:"limit"`
+	OrderBy        string `json:"orderBy"`
+	OrderDirection string `json:"orderDirection"`
 }
 
 func ParseGetPermissionListQuery(query GetPermissionListQuery) GetPermissionListQuery {
@@ -38,9 +38,9 @@ func ParseGetPermissionListQuery(query GetPermissionListQuery) GetPermissionList
 }
 
 type CreatePermissionBody struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type UpdatePermissionBody struct {
-	Name string
+	Name string `json:"name"`
 }

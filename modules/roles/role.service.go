@@ -8,24 +8,29 @@ import (
 	"hanhngo.me/m/common"
 	"hanhngo.me/m/database"
 	"hanhngo.me/m/model"
+	"hanhngo.me/m/modules/permissions"
 )
 
-type RoleService struct{}
-
-func NewRoleService() RoleService {
-	return RoleService{}
+type RoleService struct {
+	permissionService permissions.PermissionService
 }
 
-func (this *RoleService) CreateRole(body CreateRoleBody) (*model.Role, error) {
+func NewRoleService(permissionService permissions.PermissionService) RoleService {
+	return RoleService{
+		permissionService: permissionService,
+	}
+}
+
+func (service *RoleService) CreateRole(body CreateRoleBody) (*model.Role, error) {
 	db := database.DB
-	existedRole, err := this.GetRoleByName(body.Name)
+	existedRole, err := service.GetRoleByName(body.Name)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if existedRole != nil {
-		return nil, errors.New("Role existed")
+		return nil, errors.New("role existed")
 	}
 
 	role := model.Role{
@@ -56,7 +61,7 @@ func (*RoleService) GetRoleById(id int) (*model.Role, error) {
 	db := database.DB
 
 	var role model.Role
-	err := db.First(&role, id).Error
+	err := db.Preload("Permissions").First(&role, id).Error
 
 	return &role, err
 }
@@ -74,10 +79,10 @@ func (*RoleService) GetRoleByName(name string) (*model.Role, error) {
 	return &role, err
 }
 
-func (this *RoleService) UpdateRole(id int, body UpdateRoleBody) (*model.Role, error) {
+func (service *RoleService) UpdateRole(id int, body UpdateRoleBody) (*model.Role, error) {
 	db := database.DB
 
-	role, err := this.GetRoleById(id)
+	role, err := service.GetRoleById(id)
 
 	if err != nil {
 		return nil, err
@@ -89,10 +94,10 @@ func (this *RoleService) UpdateRole(id int, body UpdateRoleBody) (*model.Role, e
 	return role, err
 }
 
-func (this *RoleService) DeleteRole(id int) error {
+func (service *RoleService) DeleteRole(id int) error {
 	db := database.DB
 
-	role, err := this.GetRoleById(id)
+	role, err := service.GetRoleById(id)
 
 	if err != nil {
 		return err
@@ -101,4 +106,62 @@ func (this *RoleService) DeleteRole(id int) error {
 	err = db.Delete(&role).Error
 
 	return err
+}
+
+func (service *RoleService) UpdateRolePermissions(id int, body UpdateRolePermissionsBody) (*model.Role, error) {
+	db := database.DB
+
+	permissions, err := service.permissionService.GetPermissionByIds(body.PermissionIds)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(*permissions) < len(body.PermissionIds) {
+		return nil, errors.New("some permissions not existed")
+	}
+
+	role, err := service.GetRoleById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	toAddPermissions, toDeletePermissions := common.Difference(*permissions, role.Permissions)
+	err = db.Transaction(func(tx *gorm.DB) error {
+		toDeletePermissionIds := common.Map(toDeletePermissions, func(p model.Permission) uint {
+			return p.ID
+		})
+
+		toAddRolePermissions := common.Map(toAddPermissions, func(p model.Permission) model.RolePermission {
+			return model.RolePermission{
+				RoleID:       role.ID,
+				PermissionID: p.ID,
+			}
+		})
+
+		if len(toDeletePermissionIds) > 0 {
+			if err := db.Where("role_id = ?", role.ID).Where("permission_id IN ?", toDeletePermissionIds).Delete(&model.RolePermission{}).Error; err != nil {
+				return err
+			}
+		}
+
+		if len(toAddRolePermissions) > 0 {
+			if err := db.Create(&toAddRolePermissions).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	updatedRole, err := service.GetRoleById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedRole, nil
 }

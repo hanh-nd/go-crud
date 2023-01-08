@@ -7,10 +7,10 @@ import (
 )
 
 type GetRoleGroupListQuery struct {
-	Page           int
-	Limit          int
-	OrderBy        string
-	OrderDirection string
+	Page           int    `json:"page"`
+	Limit          int    `json:"limit"`
+	OrderBy        string `json:"orderBy"`
+	OrderDirection string `json:"orderDirection"`
 }
 
 func ParseGetRoleGroupListQuery(query GetRoleGroupListQuery) GetRoleGroupListQuery {
@@ -38,9 +38,9 @@ func ParseGetRoleGroupListQuery(query GetRoleGroupListQuery) GetRoleGroupListQue
 }
 
 type CreateRoleGroupBody struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type UpdateRoleGroupBody struct {
-	Name string
+	Name string `json:"name"`
 }

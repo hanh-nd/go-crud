@@ -19,15 +19,15 @@ func NewUserService() UserService {
 
 var UserOmit = []string{"password"}
 
-func (this *UserService) CreateUser(body CreateUserBody) (*model.User, error) {
+func (service *UserService) CreateUser(body CreateUserBody) (*model.User, error) {
 	db := database.DB
-	existedUser, err := this.GetUserByUsername(body.Username)
+	existedUser, err := service.GetUserByUsername(body.Username)
 	if err != nil {
 		return nil, err
 	}
 
 	if existedUser != nil {
-		return nil, errors.New("User existed!")
+		return nil, errors.New("user existed")
 	}
 
 	hashedPassword, err := bcrypt.Hash(body.Password)
@@ -66,7 +66,7 @@ func (*UserService) GetUserList(query GetUserListQuery) (common.GetListResponse,
 func (*UserService) GetUserById(id int) (*model.User, error) {
 	db := database.DB
 	var user model.User
-	err := db.Model(&model.User{}).Omit(UserOmit...).First(&user, id).Error
+	err := db.Model(&model.User{}).Omit(UserOmit...).Preload("Roles").Preload("UserGroups").Preload("RoleGroups").Preload("ManageGroups").First(&user, id).Error
 	return &user, err
 }
 
@@ -80,9 +80,9 @@ func (*UserService) GetUserByUsername(username string) (*model.User, error) {
 	return &user, err
 }
 
-func (this *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBody) (*model.User, error) {
+func (service *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBody) (*model.User, error) {
 	db := database.DB
-	user, err := this.GetUserById(id)
+	user, err := service.GetUserById(id)
 	if err != nil {
 		return user, err
 	}
@@ -96,9 +96,9 @@ func (this *UserService) UpdateUserProfileById(id int, body UpdateUserProfileBod
 	return user, err
 }
 
-func (this *UserService) DeleteUserById(id int) error {
+func (service *UserService) DeleteUserById(id int) error {
 	db := database.DB
-	user, err := this.GetUserById(id)
+	user, err := service.GetUserById(id)
 
 	if err != nil {
 		return err

@@ -18,13 +18,13 @@ func NewUserGroupHandler(userGroupService UserGroupService) UserGroupHandler {
 	}
 }
 
-func (this *UserGroupHandler) CreateUserGroup(c *fiber.Ctx) error {
+func (handler *UserGroupHandler) CreateUserGroup(c *fiber.Ctx) error {
 	var body CreateUserGroupBody
-	if err := c.BodyParser(body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	userGroup, err := this.userGroupService.CreateUserGroup(body)
+	userGroup, err := handler.userGroupService.CreateUserGroup(body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -33,13 +33,13 @@ func (this *UserGroupHandler) CreateUserGroup(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(userGroup, fiber.StatusCreated))
 }
 
-func (this *UserGroupHandler) GetUserGroupList(c *fiber.Ctx) error {
+func (handler *UserGroupHandler) GetUserGroupList(c *fiber.Ctx) error {
 	var query GetUserGroupListQuery
-	if err := c.QueryParser(query); err != nil {
+	if err := c.QueryParser(&query); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	userGroups, err := this.userGroupService.GetUserGroupList(query)
+	userGroups, err := handler.userGroupService.GetUserGroupList(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -48,14 +48,14 @@ func (this *UserGroupHandler) GetUserGroupList(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(userGroups))
 }
 
-func (this *UserGroupHandler) GetUserGroupById(c *fiber.Ctx) error {
+func (handler *UserGroupHandler) GetUserGroupById(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "UserGroup id must be integer!"))
 	}
 
-	userGroup, err := this.userGroupService.GetUserGroupById(id)
+	userGroup, err := handler.userGroupService.GetUserGroupById(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -64,7 +64,7 @@ func (this *UserGroupHandler) GetUserGroupById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(userGroup))
 }
 
-func (this *UserGroupHandler) UpdateUserGroup(c *fiber.Ctx) error {
+func (handler *UserGroupHandler) UpdateUserGroup(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
@@ -72,11 +72,11 @@ func (this *UserGroupHandler) UpdateUserGroup(c *fiber.Ctx) error {
 	}
 
 	var body UpdateUserGroupBody
-	if err := c.QueryParser(&body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	userGroup, err := this.userGroupService.UpdateUserGroup(id, body)
+	userGroup, err := handler.userGroupService.UpdateUserGroup(id, body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -85,14 +85,14 @@ func (this *UserGroupHandler) UpdateUserGroup(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(userGroup))
 }
 
-func (this *UserGroupHandler) DeleteUserGroup(c *fiber.Ctx) error {
+func (handler *UserGroupHandler) DeleteUserGroup(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "UserGroup id must be integer!"))
 	}
 
-	err = this.userGroupService.DeleteUserGroup(id)
+	err = handler.userGroupService.DeleteUserGroup(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))

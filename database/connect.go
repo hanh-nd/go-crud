@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"hanhngo.me/m/config"
 	"hanhngo.me/m/model"
@@ -22,7 +23,9 @@ func Connect() {
 		config.Get("DB_NAME"),
 		config.Get("DB_SSL_MODE", "disable"),
 	)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 
 	if err != nil {
 		panic("Failed to connect to the database")
@@ -30,7 +33,18 @@ func Connect() {
 
 	DB = db
 	fmt.Println("Connected to the database")
-	db.AutoMigrate(&model.Permission{}, &model.Role{}, &model.RoleGroup{}, &model.User{}, &model.UserGroup{})
+	db.AutoMigrate(
+		&model.Permission{},
+		&model.Role{},
+		&model.RoleGroup{},
+		&model.User{},
+		&model.UserGroup{},
+		&model.RolePermission{},
+		&model.RoleGroupRole{},
+		&model.UserRole{},
+		&model.UserRoleGroup{},
+		&model.UserGroupUser{},
+	)
 	setupRelationships(db)
 }
 

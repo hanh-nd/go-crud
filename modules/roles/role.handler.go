@@ -18,13 +18,13 @@ func NewRoleHandler(roleService RoleService) RoleHandler {
 	}
 }
 
-func (this *RoleHandler) CreateRole(c *fiber.Ctx) error {
+func (handler *RoleHandler) CreateRole(c *fiber.Ctx) error {
 	var body CreateRoleBody
-	if err := c.BodyParser(body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	role, err := this.roleService.CreateRole(body)
+	role, err := handler.roleService.CreateRole(body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -33,13 +33,13 @@ func (this *RoleHandler) CreateRole(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(role, fiber.StatusCreated))
 }
 
-func (this *RoleHandler) GetRoleList(c *fiber.Ctx) error {
+func (handler *RoleHandler) GetRoleList(c *fiber.Ctx) error {
 	var query GetRoleListQuery
-	if err := c.QueryParser(query); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
+	if err := c.QueryParser(&query); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid query!"))
 	}
 
-	roles, err := this.roleService.GetRoleList(query)
+	roles, err := handler.roleService.GetRoleList(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -48,14 +48,14 @@ func (this *RoleHandler) GetRoleList(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(roles))
 }
 
-func (this *RoleHandler) GetRoleById(c *fiber.Ctx) error {
+func (handler *RoleHandler) GetRoleById(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Role id must be integer!"))
 	}
 
-	role, err := this.roleService.GetRoleById(id)
+	role, err := handler.roleService.GetRoleById(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -64,7 +64,7 @@ func (this *RoleHandler) GetRoleById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(role))
 }
 
-func (this *RoleHandler) UpdateRole(c *fiber.Ctx) error {
+func (handler *RoleHandler) UpdateRole(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
@@ -72,11 +72,11 @@ func (this *RoleHandler) UpdateRole(c *fiber.Ctx) error {
 	}
 
 	var body UpdateRoleBody
-	if err := c.QueryParser(&body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	role, err := this.roleService.UpdateRole(id, body)
+	role, err := handler.roleService.UpdateRole(id, body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -85,18 +85,40 @@ func (this *RoleHandler) UpdateRole(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(role))
 }
 
-func (this *RoleHandler) DeleteRole(c *fiber.Ctx) error {
+func (handler *RoleHandler) DeleteRole(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Role id must be integer!"))
 	}
 
-	err = this.roleService.DeleteRole(id)
+	err = handler.roleService.DeleteRole(id)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("OK"))
+}
+
+func (handler *RoleHandler) UpdateRolePermissions(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Role id must be integer!"))
+	}
+
+	var body UpdateRolePermissionsBody
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body"))
+
+	}
+
+	role, err := handler.roleService.UpdateRolePermissions(id, body)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.NewSuccessResponse(role))
 }

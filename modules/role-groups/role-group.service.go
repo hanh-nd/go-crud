@@ -16,9 +16,9 @@ func NewRoleGroupService() RoleGroupService {
 	return RoleGroupService{}
 }
 
-func (this *RoleGroupService) CreateRoleGroup(body CreateRoleGroupBody) (*model.RoleGroup, error) {
+func (service *RoleGroupService) CreateRoleGroup(body CreateRoleGroupBody) (*model.RoleGroup, error) {
 	db := database.DB
-	existedRoleGroup, err := this.GetRoleGroupByName(body.Name)
+	existedRoleGroup, err := service.GetRoleGroupByName(body.Name)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (*RoleGroupService) GetRoleGroupById(id int) (*model.RoleGroup, error) {
 	db := database.DB
 
 	var roleGroup model.RoleGroup
-	err := db.First(&roleGroup, id).Error
+	err := db.Preload("Roles").First(&roleGroup, id).Error
 
 	return &roleGroup, err
 }
@@ -74,10 +74,10 @@ func (*RoleGroupService) GetRoleGroupByName(name string) (*model.RoleGroup, erro
 	return &roleGroup, err
 }
 
-func (this *RoleGroupService) UpdateRoleGroup(id int, body UpdateRoleGroupBody) (*model.RoleGroup, error) {
+func (service *RoleGroupService) UpdateRoleGroup(id int, body UpdateRoleGroupBody) (*model.RoleGroup, error) {
 	db := database.DB
 
-	roleGroup, err := this.GetRoleGroupById(id)
+	roleGroup, err := service.GetRoleGroupById(id)
 
 	if err != nil {
 		return nil, err
@@ -89,10 +89,10 @@ func (this *RoleGroupService) UpdateRoleGroup(id int, body UpdateRoleGroupBody) 
 	return roleGroup, err
 }
 
-func (this *RoleGroupService) DeleteRoleGroup(id int) error {
+func (service *RoleGroupService) DeleteRoleGroup(id int) error {
 	db := database.DB
 
-	roleGroup, err := this.GetRoleGroupById(id)
+	roleGroup, err := service.GetRoleGroupById(id)
 
 	if err != nil {
 		return err

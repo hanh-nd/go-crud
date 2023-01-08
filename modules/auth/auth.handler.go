@@ -19,14 +19,14 @@ func NewAuthHandler(authService AuthService, userService users.UserService) Auth
 	}
 }
 
-func (this *AuthHandler) Register(c *fiber.Ctx) error {
+func (handler *AuthHandler) Register(c *fiber.Ctx) error {
 	var body users.CreateUserBody
 
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	accessToken, err := this.authService.Register(body)
+	accessToken, err := handler.authService.Register(body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))
@@ -37,13 +37,13 @@ func (this *AuthHandler) Register(c *fiber.Ctx) error {
 	}, fiber.StatusCreated))
 }
 
-func (this *AuthHandler) Login(c *fiber.Ctx) error {
+func (handler *AuthHandler) Login(c *fiber.Ctx) error {
 	var body LoginBody
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, "Invalid body!"))
 	}
 
-	accessToken, err := this.authService.Login(body)
+	accessToken, err := handler.authService.Login(body)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.NewErrorResponse(fiber.StatusBadRequest, err.Error()))

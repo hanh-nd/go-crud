@@ -7,10 +7,10 @@ import (
 )
 
 type GetUserGroupListQuery struct {
-	Page           int
-	Limit          int
-	OrderBy        string
-	OrderDirection string
+	Page           int    `json:"page"`
+	Limit          int    `json:"limit"`
+	OrderBy        string `json:"orderBy"`
+	OrderDirection string `json:"orderDirection"`
 }
 
 func ParseGetUserGroupListQuery(query GetUserGroupListQuery) GetUserGroupListQuery {
@@ -38,9 +38,9 @@ func ParseGetUserGroupListQuery(query GetUserGroupListQuery) GetUserGroupListQue
 }
 
 type CreateUserGroupBody struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type UpdateUserGroupBody struct {
-	Name string
+	Name string `json:"name"`
 }

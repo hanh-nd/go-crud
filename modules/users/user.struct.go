@@ -7,10 +7,10 @@ import (
 )
 
 type GetUserListQuery struct {
-	Page           int
-	Limit          int
-	OrderBy        string
-	OrderDirection string
+	Page           int    `json:"page"`
+	Limit          int    `json:"limit"`
+	OrderBy        string `json:"orderBy"`
+	OrderDirection string `json:"orderDirection"`
 }
 
 func ParseGetUserListQuery(query GetUserListQuery) GetUserListQuery {
@@ -38,11 +38,11 @@ func ParseGetUserListQuery(query GetUserListQuery) GetUserListQuery {
 }
 
 type CreateUserBody struct {
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type UpdateUserProfileBody struct {
-	Email string
+	Email string `json:"email"`
 }

@@ -16,9 +16,9 @@ func NewUserGroupService() UserGroupService {
 	return UserGroupService{}
 }
 
-func (this *UserGroupService) CreateUserGroup(body CreateUserGroupBody) (*model.UserGroup, error) {
+func (service *UserGroupService) CreateUserGroup(body CreateUserGroupBody) (*model.UserGroup, error) {
 	db := database.DB
-	existedUserGroup, err := this.GetUserGroupByName(body.Name)
+	existedUserGroup, err := service.GetUserGroupByName(body.Name)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (*UserGroupService) GetUserGroupById(id int) (*model.UserGroup, error) {
 	db := database.DB
 
 	var userGroup model.UserGroup
-	err := db.First(&userGroup, id).Error
+	err := db.Preload("Manager").Preload("Users").First(&userGroup, id).Error
 
 	return &userGroup, err
 }
@@ -74,10 +74,10 @@ func (*UserGroupService) GetUserGroupByName(name string) (*model.UserGroup, erro
 	return &userGroup, err
 }
 
-func (this *UserGroupService) UpdateUserGroup(id int, body UpdateUserGroupBody) (*model.UserGroup, error) {
+func (service *UserGroupService) UpdateUserGroup(id int, body UpdateUserGroupBody) (*model.UserGroup, error) {
 	db := database.DB
 
-	userGroup, err := this.GetUserGroupById(id)
+	userGroup, err := service.GetUserGroupById(id)
 
 	if err != nil {
 		return nil, err
@@ -89,10 +89,10 @@ func (this *UserGroupService) UpdateUserGroup(id int, body UpdateUserGroupBody) 
 	return userGroup, err
 }
 
-func (this *UserGroupService) DeleteUserGroup(id int) error {
+func (service *UserGroupService) DeleteUserGroup(id int) error {
 	db := database.DB
 
-	userGroup, err := this.GetUserGroupById(id)
+	userGroup, err := service.GetUserGroupById(id)
 
 	if err != nil {
 		return err
